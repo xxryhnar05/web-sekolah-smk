@@ -20,9 +20,12 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "SMA Nusantara Unggul | Profil Sekolah",
+  title: "SMA MUHAMMADIYAH 1 KOTA MOJOKERTO | Profil Sekolah",
   description:
-    "Profil resmi SMA Nusantara Unggul: pendidikan, karakter, prestasi, dan komunitas sekolah.",
+    "Profil resmi SMA Muhammadiyah 1 Kota Mojokerto: pendidikan, karakter, prestasi, dan komunitas sekolah.",
+  icons: {
+    icon: "/logoo.png",
+  },
 };
 
 // app/layout.tsx

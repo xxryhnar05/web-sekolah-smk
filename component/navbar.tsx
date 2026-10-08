@@ -96,7 +96,7 @@ export default function Navbar() {
               src="/logoo.png"
               width={56}
               height={56}
-              alt="Logo SMK Muhammadiyah 1 Kota Mojokerto"
+              alt="Logo SMA Muhammadiyah 1 Kota Mojokerto"
               className="h-11 w-11 shrink-0 object-contain sm:h-14 sm:w-14"
             />
             <div className="min-w-0">
