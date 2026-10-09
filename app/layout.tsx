@@ -33,7 +33,7 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
+}) { 
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`${montserrat.variable} min-h-full flex flex-col`} suppressHydrationWarning>

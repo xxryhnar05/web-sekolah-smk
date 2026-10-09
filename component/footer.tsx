@@ -18,7 +18,7 @@ export default function Footer() {
           <address className="mt-5 space-y-3 break-words text-sm not-italic leading-relaxed text-blue-100/80">
             <p>
               <span className="font-semibold text-white">Alamat:</span>{" "}
-              Jl. Surodinawan No.110, Mergelo, Surodinawan, Kec. Prajurit Kulon, Kota Mojokerto, Jawa Timur 61328
+              Jl. Brawijaya, Sinoman VI/24, RT.03 RW.02 Kel.Miji Kec, Prajurit Kulon Kota Mojokerto, Jawa Timur 
             </p>
             <p>
               <span className="font-semibold text-white">Email:</span>{" "}
@@ -69,8 +69,23 @@ export default function Footer() {
           </h2>
           <ul className="mt-5 space-y-3">
             <li>
-              <a className={footerLinkClass} href="https://www.instagram.com/smkmutukotamojokerto/" target="_blank" rel="noreferrer">
+              <a className={footerLinkClass} href="https://www.instagram.com/smkmutumojokerto?srtk=ZGY0enlpODY3enFu/" target="_blank" rel="noreferrer">
                 Instagram
+              </a>
+            </li>
+            <li>
+              <a className={footerLinkClass} href="https://www.tiktok.com/@smkmutumojokerto" target="_blank" rel="noreferrer">
+                TikTok
+              </a>
+            </li>
+            <li>
+              <a className={footerLinkClass} href="https://twitter.com/officialsmkmusa" target="_blank" rel="noreferrer">
+                Twitter
+              </a>
+            </li>
+            <li>
+              <a className={footerLinkClass} href="https://www.facebook.com/profile.php?id=61551851908447" target="_blank" rel="noreferrer">
+                Facebook
               </a>
             </li>
             <li>
