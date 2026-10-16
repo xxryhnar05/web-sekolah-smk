@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import SiteFrame from "@/component/site-frame";
 import "./globals.css";
@@ -26,6 +26,11 @@ export const metadata: Metadata = {
   icons: {
     icon: "/logoo.png",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 // app/layout.tsx

@@ -5,13 +5,13 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noreferrer"
       aria-label="Chat WhatsApp Admin SMK MuTu"
-      className="fixed bottom-4 right-4 z-50 inline-flex items-center gap-2 rounded-full bg-[#20c965] px-4 py-3 text-white shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:bg-[#19b957] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:bottom-7 sm:right-7 sm:gap-3 sm:px-6 sm:py-4"
+      className="fixed bottom-4 right-4 z-50 inline-flex h-12 w-12 items-center justify-center gap-0 rounded-full bg-[#20c965] p-3 text-white shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:bg-[#19b957] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:bottom-7 sm:right-7 sm:h-auto sm:w-auto sm:gap-3 sm:px-6 sm:py-4"
     >
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
         fill="none"
-        className="h-7 w-7 shrink-0 sm:h-9 sm:w-9"
+        className="h-6 w-6 shrink-0 sm:h-9 sm:w-9"
       >
         <path
           d="M20.25 11.65a8.25 8.25 0 0 1-12.2 7.24L3 20l1.14-4.78a8.25 8.25 0 1 1 16.11-3.57Z"
@@ -25,7 +25,7 @@ export default function WhatsAppFloat() {
           fill="currentColor"
         />
       </svg>
-      <span className="whitespace-nowrap text-sm font-medium sm:text-lg">Admin SMK MuTu</span>
+      <span className="hidden whitespace-nowrap text-sm font-medium sm:inline sm:text-lg">Admin SMK MuTu</span>
     </a>
   );
 }

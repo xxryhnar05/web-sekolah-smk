@@ -206,7 +206,7 @@ export default function Navbar() {
                   {group.title}
                   <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openDropdown === group.id ? "rotate-180" : ""}`} />
                 </button>
-                <div className={`absolute left-0 top-full z-50 w-64 rounded-xl border border-slate-200/80 bg-white p-3 shadow-xl shadow-slate-900/10 transition-all duration-200 ease-out ${openDropdown === group.id ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0 pointer-events-none"}`}>
+                <div className={`absolute ${group.id === "prestasi-mulia" ? "right-0" : "left-0"} top-full z-50 w-64 rounded-xl border border-slate-200/80 bg-white p-3 shadow-xl shadow-slate-900/10 transition-all duration-200 ease-out ${openDropdown === group.id ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0 pointer-events-none"}`}>
                   <ul className="space-y-1">
                     {group.items.map((item) => (
                       <li key={item.href}>

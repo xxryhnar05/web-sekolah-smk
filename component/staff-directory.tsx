@@ -49,14 +49,14 @@ export default function StaffDirectory({
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-[#0a1429] to-transparent" />
           </div>
           <div className="mt-5 flex flex-1 flex-col items-center px-2 text-center">
-            <h2 title={person.name} className="max-w-full overflow-x-auto whitespace-nowrap text-base font-bold leading-snug text-white transition-colors group-hover:text-amber-300 sm:text-lg">{person.name}</h2>
-            <p title={person.position} className="mt-2 max-w-full overflow-x-auto whitespace-nowrap text-xs font-medium uppercase tracking-wider text-amber-400/80 sm:text-sm">{person.position}</p>
+            <h2 title={person.name} className="max-w-full break-words text-base font-bold leading-snug text-white transition-colors group-hover:text-amber-300 sm:text-lg">{person.name}</h2>
+            <p title={person.position} className="mt-2 max-w-full break-words text-xs font-medium uppercase tracking-wider text-amber-400/80 sm:text-sm">{person.position}</p>
             {person.details.length > 0 && (
               <dl className="mt-5 w-full space-y-3 border-t border-slate-700/50 pt-4 text-center text-xs sm:text-sm">
                 {person.details.map((detail) => (
                   <div key={detail.label} className="flex min-w-0 flex-col items-center gap-1">
-                    <dt className="max-w-full overflow-x-auto whitespace-nowrap text-slate-500">{detail.label}</dt>
-                    <dd title={detail.value} className="max-w-full overflow-x-auto whitespace-nowrap leading-relaxed text-slate-400">{detail.value}</dd>
+                    <dt className="max-w-full break-words text-slate-500">{detail.label}</dt>
+                    <dd title={detail.value} className="max-w-full break-words leading-relaxed text-slate-400 [overflow-wrap:anywhere]">{detail.value}</dd>
                   </div>
                 ))}
               </dl>
