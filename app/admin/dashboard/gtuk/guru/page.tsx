@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowserClient'
+import * as XLSX from '@e965/xlsx'
 import {
   Plus,
   Trash2,
@@ -21,6 +22,8 @@ import {
   ImageIcon,
   Link as LinkIcon,
   Compass,
+  FileSpreadsheet,
+  Download,
 } from 'lucide-react'
 
 interface StaffGuru {
@@ -43,11 +46,40 @@ interface StaffGuru {
   created_at: string
 }
 
+type GuruImportRecord = Omit<StaffGuru, 'id' | 'created_at'>
+
+interface GuruImportPreview {
+  fileName: string
+  rows: GuruImportRecord[]
+  errors: string[]
+}
+
+const GURU_IMPORT_HEADERS = [
+  'Nama',
+  'NIP',
+  'Jenis Kelamin (L/P)',
+  'Jabatan',
+  'Mata Pelajaran',
+  'Pendidikan Terakhir',
+  'Tempat, Tanggal Lahir',
+  'No. HP / WhatsApp',
+  'Email',
+  'Alamat',
+  'Bio / Catatan',
+  'Foto URL',
+  'Pimpinan (Ya/Tidak)',
+  'Urutan',
+]
+
 export default function AdminGuruPage() {
   const router = useRouter()
+  const importFileRef = useRef<HTMLInputElement>(null)
   const [guruList, setGuruList] = useState<StaffGuru[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [parsingImport, setParsingImport] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importPreview, setImportPreview] = useState<GuruImportPreview | null>(null)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // State Modal Dialog
@@ -75,6 +107,165 @@ export default function AdminGuruPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string>('')
   const [uploadingImage, setUploadingImage] = useState(false)
+
+  const handleDownloadImportTemplate = () => {
+    const worksheet = XLSX.utils.aoa_to_sheet([GURU_IMPORT_HEADERS])
+    worksheet['!cols'] = GURU_IMPORT_HEADERS.map(() => ({ wch: 22 }))
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Guru')
+    XLSX.writeFile(workbook, 'template-data-guru.xlsx')
+  }
+
+  const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    setStatusMessage(null)
+    setParsingImport(true)
+
+    try {
+      if (!/\.(xlsx|xls|csv)$/i.test(file.name)) {
+        throw new Error('Pilih file Excel dengan format .xlsx, .xls, atau .csv.')
+      }
+
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' })
+      const firstSheetName = workbook.SheetNames[0]
+      const worksheet = firstSheetName ? workbook.Sheets[firstSheetName] : undefined
+      if (!worksheet) throw new Error('File Excel tidak memiliki lembar kerja yang dapat dibaca.')
+
+      const sheetRows = XLSX.utils.sheet_to_json<unknown[]>(worksheet, {
+        header: 1,
+        raw: false,
+        defval: '',
+      })
+      const normalizeHeader = (value: unknown) =>
+        String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '')
+      const headers = (sheetRows[0] ?? []).map(normalizeHeader)
+      const findColumn = (aliases: string[]) => headers.findIndex((header) => aliases.includes(header))
+      const columns = {
+        name: findColumn(['nama', 'namalengkap', 'name', 'fullname']),
+        nip: findColumn(['nip', 'nbm']),
+        gender: findColumn(['jeniskelamin', 'jeniskelaminlp', 'gender', 'jk']),
+        position: findColumn(['jabatan', 'position']),
+        subject: findColumn(['matapelajaran', 'mapel', 'subject']),
+        education: findColumn(['pendidikanterakhir', 'pendidikan', 'education']),
+        birthPlaceDate: findColumn(['tempattanggallahir', 'tempatlahir', 'birthplacedate']),
+        phone: findColumn(['nohpwhatsapp', 'nohp', 'telepon', 'phone', 'whatsapp']),
+        email: findColumn(['email', 'emailkontak']),
+        address: findColumn(['alamat', 'address']),
+        bio: findColumn(['biocatatan', 'bio', 'catatan']),
+        photoUrl: findColumn(['fotourl', 'photourl', 'foto', 'urlfoto']),
+        leadership: findColumn(['pimpinanyatidak', 'pimpinan']),
+        orderIndex: findColumn(['urutan', 'order', 'orderindex']),
+      }
+
+      if (columns.name < 0) {
+        throw new Error('Kolom "Nama" tidak ditemukan. Gunakan templat Excel yang tersedia.')
+      }
+
+      const rows: GuruImportRecord[] = []
+      const errors: string[] = []
+      const toText = (row: unknown[], column: number) =>
+        column < 0 ? '' : String(row[column] ?? '').trim()
+      const dataRows = sheetRows.slice(1)
+
+      dataRows.forEach((row, index) => {
+        if (row.every((cell) => String(cell ?? '').trim() === '')) return
+
+        const excelRow = index + 2
+        const name = toText(row, columns.name)
+        if (!name) {
+          errors.push(`Baris ${excelRow}: Nama wajib diisi.`)
+          return
+        }
+
+        const genderValue = normalizeHeader(toText(row, columns.gender))
+        let gender: 'L' | 'P' = 'L'
+        if (genderValue && ['p', 'perempuan', 'wanita', 'female'].includes(genderValue)) {
+          gender = 'P'
+        } else if (genderValue && !['l', 'lakilaki', 'pria', 'male'].includes(genderValue)) {
+          errors.push(`Baris ${excelRow}: Jenis kelamin harus L atau P.`)
+          return
+        }
+
+        const leadershipValue = normalizeHeader(toText(row, columns.leadership))
+        let isLeadership = false
+        if (['ya', 'y', 'yes', 'true', '1', 'pimpinan'].includes(leadershipValue)) {
+          isLeadership = true
+        } else if (
+          leadershipValue &&
+          !['tidak', 't', 'no', 'false', '0', 'bukan'].includes(leadershipValue)
+        ) {
+          errors.push(`Baris ${excelRow}: Pimpinan harus diisi Ya atau Tidak.`)
+          return
+        }
+
+        const orderValue = toText(row, columns.orderIndex)
+        const orderIndex = orderValue ? Number(orderValue) : guruList.length + rows.length + 1
+        if (!Number.isInteger(orderIndex) || orderIndex < 0) {
+          errors.push(`Baris ${excelRow}: Urutan harus berupa bilangan bulat nol atau lebih.`)
+          return
+        }
+
+        rows.push({
+          name,
+          nip: toText(row, columns.nip) || null,
+          gender,
+          category: 'guru',
+          position: toText(row, columns.position) || 'Guru Pengajar',
+          subject: toText(row, columns.subject) || null,
+          education: toText(row, columns.education) || null,
+          birth_place_date: toText(row, columns.birthPlaceDate) || null,
+          phone: toText(row, columns.phone) || null,
+          email: toText(row, columns.email) || null,
+          address: toText(row, columns.address) || null,
+          bio: toText(row, columns.bio) || null,
+          photo_url: toText(row, columns.photoUrl) || null,
+          is_leadership: isLeadership,
+          order_index: orderIndex,
+        })
+      })
+
+      if (rows.length === 0 && errors.length === 0) {
+        errors.push('Tidak ada baris data untuk diimpor. Isi data mulai dari baris kedua.')
+      }
+      setImportPreview({ fileName: file.name, rows, errors })
+    } catch (error) {
+      setStatusMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Gagal membaca file Excel.',
+      })
+    } finally {
+      setParsingImport(false)
+    }
+  }
+
+  const handleConfirmImport = async () => {
+    if (!importPreview || importPreview.errors.length > 0 || importPreview.rows.length === 0) return
+
+    setImporting(true)
+    setStatusMessage(null)
+    try {
+      const { error } = await supabase.from('staff').insert(importPreview.rows)
+      if (error) throw error
+
+      setStatusMessage({
+        type: 'success',
+        text: `${importPreview.rows.length} data Guru berhasil diimpor.`,
+      })
+      setImportPreview(null)
+      await fetchGuruData()
+      router.refresh()
+    } catch (error) {
+      setStatusMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Gagal mengimpor data Guru.',
+      })
+    } finally {
+      setImporting(false)
+    }
+  }
 
   // Fetch Data Guru (Filter category = 'guru')
   const fetchGuruData = async () => {
@@ -301,6 +492,44 @@ export default function AdminGuruPage() {
           </button>
         </div>
 
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e3e0d8] bg-[#faf9f6] px-5 py-4 sm:px-7 lg:px-8">
+          <div className="flex items-start gap-3">
+            <FileSpreadsheet className="mt-0.5 h-5 w-5 shrink-0 text-[#a57c31]" />
+            <div>
+              <p className="text-xs font-semibold text-[#17231f]">Impor data dari Excel</p>
+              <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                Nama wajib diisi; jenis kelamin gunakan L/P (kosong berarti L). Isi NIP dan nomor HP sebagai teks agar angka nol di depan tidak hilang.
+                Gunakan templat, isi data mulai baris kedua, lalu unggah file .xlsx, .xls, atau .csv.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleDownloadImportTemplate}
+              className="inline-flex items-center gap-2 rounded-lg border border-[#dedbd2] bg-white px-3 py-2 text-xs font-semibold text-[#34443b] transition hover:border-[#bd9142]"
+            >
+              <Download className="h-3.5 w-3.5" /> Unduh Templat
+            </button>
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={handleExcelImport}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => importFileRef.current?.click()}
+              disabled={parsingImport || importing}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#17231f] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#263a32] disabled:cursor-wait disabled:opacity-50"
+            >
+              {parsingImport ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+              {parsingImport ? 'Membaca file...' : 'Pilih File Excel'}
+            </button>
+          </div>
+        </div>
+
       {/* Pesan Status */}
       {statusMessage && (
         <div
@@ -419,6 +648,97 @@ export default function AdminGuruPage() {
       )}
 
       </section>
+
+      {importPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#17231f]/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#e3e0d8] bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#e3e0d8] px-5 py-4 sm:px-6">
+              <div>
+                <h2 className="text-sm font-semibold text-[#17231f]">Tinjau Impor Data Guru</h2>
+                <p className="mt-1 max-w-[68vw] truncate text-xs text-slate-500">{importPreview.fileName}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setImportPreview(null)}
+                disabled={importing}
+                aria-label="Tutup pratinjau impor"
+                className="rounded-lg bg-[#f2efe7] p-1.5 text-slate-500 transition hover:bg-[#e8e3d6] disabled:opacity-50"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[65vh] space-y-4 overflow-y-auto p-5 sm:p-6">
+              {statusMessage?.type === 'error' && (
+                <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">
+                  {statusMessage.text}
+                </p>
+              )}
+              {importPreview.errors.length > 0 ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">
+                  <p className="font-semibold">
+                    Perbaiki {importPreview.errors.length} masalah berikut sebelum impor:
+                  </p>
+                  <ul className="mt-2 max-h-36 list-inside list-disc space-y-1 overflow-y-auto">
+                    {importPreview.errors.map((error, index) => <li key={`${index}-${error}`}>{error}</li>)}
+                  </ul>
+                </div>
+              ) : (
+                <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800">
+                  {importPreview.rows.length} data siap diimpor. Semua baris akan ditambahkan sebagai data baru.
+                </p>
+              )}
+              {importPreview.rows.length > 0 && (
+                <div className="overflow-x-auto rounded-xl border border-[#e3e0d8]">
+                  <table className="w-full min-w-[420px] text-left text-xs">
+                    <thead className="bg-[#faf9f6] text-slate-500">
+                      <tr>
+                        <th className="px-3 py-2 font-semibold">Nama</th>
+                        <th className="px-3 py-2 font-semibold">NIP</th>
+                        <th className="px-3 py-2 font-semibold">Jabatan</th>
+                        <th className="px-3 py-2 font-semibold">Mapel</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e3e0d8]">
+                      {importPreview.rows.slice(0, 5).map((row, index) => (
+                        <tr key={`${row.name}-${index}`}>
+                          <td className="px-3 py-2 text-[#17231f]">{row.name}</td>
+                          <td className="px-3 py-2 text-slate-500">{row.nip || '-'}</td>
+                          <td className="px-3 py-2 text-slate-500">{row.position}</td>
+                          <td className="px-3 py-2 text-slate-500">{row.subject || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {importPreview.rows.length > 5 && (
+                    <p className="border-t border-[#e3e0d8] px-3 py-2 text-[11px] text-slate-500">
+                      dan {importPreview.rows.length - 5} data lainnya
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 border-t border-[#e3e0d8] px-5 py-4 sm:px-6">
+              <button
+                type="button"
+                onClick={() => setImportPreview(null)}
+                disabled={importing}
+                className="rounded-xl border border-[#dedbd2] px-4 py-2 text-xs font-semibold text-slate-500 transition hover:bg-[#faf9f6] disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmImport}
+                disabled={importing || importPreview.errors.length > 0 || importPreview.rows.length === 0}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#d3aa5d] to-[#c99a42] px-4 py-2 text-xs font-semibold text-[#17231f] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {importing && <Loader2 className="h-4 w-4 animate-spin" />}
+                {importing ? 'Mengimpor...' : `Impor ${importPreview.rows.length} Data`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL FORM EDIT / TAMBAH GURU */}
       {isModalOpen && (

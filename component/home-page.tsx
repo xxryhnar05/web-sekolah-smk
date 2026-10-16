@@ -594,6 +594,45 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* 8. LOKASI SEKOLAH */}
+      <section className="border-t border-slate-700/50 py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-10">
+          <div className="mb-8 space-y-3 text-center">
+            <p className="inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-amber-400/80">
+              <span className="h-px w-8 bg-amber-400/50" />
+              Lokasi Kami
+              <span className="h-px w-8 bg-amber-400/50" />
+            </p>
+            <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl" style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}>
+              Temukan Lokasi Sekolah
+            </h2>
+            <p className="mx-auto max-w-2xl text-sm leading-7 text-slate-400">
+              GCCH+7G Surodinawan, Kota Mojokerto, Jawa Timur.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]">
+            <iframe
+              title="Peta lokasi sekolah di Kota Mojokerto"
+              src="https://www.google.com/maps?q=GCCH%2B7G%20Surodinawan%2C%20Kota%20Mojokerto%2C%20Jawa%20Timur&output=embed"
+              className="h-[320px] w-full border-0 sm:h-[420px]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <div className="mt-4 text-center">
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=GCCH%2B7G%20Surodinawan%2C%20Kota%20Mojokerto%2C%20Jawa%20Timur"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-amber-300 transition hover:text-amber-200"
+            >
+              Buka petunjuk arah di Google Maps <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
       </div>
     </div>
   )

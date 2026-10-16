@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabaseBrowser } from "@/lib/supabaseBrowserClient";
@@ -11,7 +11,40 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const checkExistingSession = async () => {
+      try {
+        const { data, error } = await supabaseBrowser.auth.getUser();
+        if (error) throw error;
+
+        if (data.user) {
+          router.replace("/admin/dashboard");
+          return;
+        }
+      } catch (error) {
+        if (isCurrent) {
+          setErrorMessage(
+            error instanceof Error
+              ? `Gagal memeriksa sesi login: ${error.message}`
+              : "Gagal memeriksa sesi login. Silakan coba kembali.",
+          );
+        }
+      }
+
+      if (isCurrent) setCheckingSession(false);
+    };
+
+    void checkExistingSession();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [router]);
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,6 +71,14 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white px-5">
+        <p className="text-sm font-medium text-slate-500">Memeriksa sesi administrator...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="grid min-h-screen flex-1 bg-white lg:grid-cols-[1.1fr_0.9fr]">
