@@ -451,7 +451,7 @@ export default function HomePage() {
                 key={item.id}
                 className="group flex flex-col justify-between overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02] transition-colors duration-300 hover:border-amber-400/30"
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950">
+                <div className="relative mx-auto aspect-[16/10] w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-lg bg-slate-950 sm:mx-0 sm:w-full sm:max-w-none sm:rounded-none">
                   <img
                     src={item.image_url}
                     alt={item.title}
@@ -537,7 +537,7 @@ export default function HomePage() {
             {imageItems.length > 0 ? imageItems.slice(0, 6).map((item, idx) => (
               <div
                 key={item.id}
-                className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02]"
+                className="group relative mx-1 aspect-[4/3] overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02] sm:mx-0"
               >
                 <img
                   src={item.url}
