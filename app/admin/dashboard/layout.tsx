@@ -4,13 +4,17 @@ import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { ArrowUpRight, Sparkles } from 'lucide-react'
 import { createSupabaseServerClient } from '@/lib/supabaseServerClient'
+import { isAdminEmail } from '@/lib/adminAuth'
 import LogoutButton from './logout-button'
 import AdminNavigation from './admin-navigation'
 
 export default async function AdminDashboardLayout({ children }: { children: ReactNode }) {
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/admin/login')
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error && error.name !== 'AuthSessionMissingError') {
+    console.error('Gagal memeriksa sesi admin:', error.message)
+  }
+  if (!user || !isAdminEmail(user.email)) redirect('/admin/login')
 
   return (
     <div className="min-h-screen bg-[#f3f2ee] font-sans text-slate-800 antialiased">

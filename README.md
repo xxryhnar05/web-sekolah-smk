@@ -37,8 +37,22 @@ Atur variabel lingkungan berikut di platform deployment sebelum melakukan build 
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
 - `RECAPTCHA_SECRET_KEY` (hanya untuk sisi server)
+- `ADMIN_EMAILS` (daftar email administrator yang diizinkan, dipisahkan koma; contoh: `admin@example.com`)
 
 Halaman beranda mengambil konten publik dari Supabase menggunakan anon key. Atur kebijakan Row Level Security (RLS) Supabase agar publik dapat melakukan `SELECT` pada baris yang boleh ditampilkan dari tabel `homepage_config`, `berita`, `alumni_testimonials`, dan `gallery_items`. Situs hanya menampilkan berita dan testimoni alumni dengan nilai `is_active` sebesar `true`. Jika gambar beranda disimpan di Supabase Storage, bucket `homepage` beserta objek gambarnya juga harus dapat dibaca secara publik. Jangan masukkan service-role key ke variabel lingkungan yang dapat diakses browser. Jangan gunakan kebijakan `ALL` untuk akses tulis publik; batasi kebijakan insert, update, dan delete hanya untuk administrator yang berwenang.
+
+### Pengamanan wajib untuk Supabase dan akun admin
+
+Anon key Supabase memang dikirim ke browser dan bukan rahasia; keamanan data bergantung pada RLS. Sebelum deployment:
+
+- Aktifkan RLS pada **setiap** tabel dan bucket Storage yang dapat diakses aplikasi. Tinjau tabel yang dipakai panel admin, bukan hanya tabel beranda.
+- Izinkan operasi tulis hanya untuk akun admin yang memang berwenang. Kebijakan `TO authenticated` saja tidak cukup karena mengizinkan semua akun Supabase yang berhasil login.
+- Untuk data publik, batasi `SELECT` pada baris yang memang boleh ditampilkan. Jangan berikan izin tulis kepada role `anon`.
+- Nonaktifkan pendaftaran publik jika akun hanya dibuat oleh pengelola, aktifkan konfirmasi email, gunakan kata sandi unik yang kuat, dan aktifkan MFA untuk akun admin melalui Supabase Auth.
+- Atur batas percobaan login/rate limit di Supabase Auth dan pantau log autentikasi. Jangan mengandalkan proteksi UI sebagai pembatas akses data.
+- Jangan pernah menaruh `service_role` key atau rahasia lain pada variabel `NEXT_PUBLIC_*`, kode browser, atau repositori.
+
+Layout dashboard memeriksa identitas sesi dan mencocokkan email dengan `ADMIN_EMAILS` di server sebelum merender halaman. Akun yang tidak tercantum tidak dapat membuka dashboard. Atur variabel ini di lingkungan lokal dan deployment. Pemeriksaan rute itu **tidak menggantikan RLS**: operasi database dari browser harus tetap ditolak oleh kebijakan Supabase untuk pengguna yang tidak berwenang.
 
 Foto yang dipilih dari laptop melalui panel admin akan diunggah ke bucket `homepage` di Supabase Storage. Situs menampilkan URL publik file tersebut; foto tidak dibaca langsung dari laptop pengunjung.
 
