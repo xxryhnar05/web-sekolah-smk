@@ -83,6 +83,7 @@ export default function AdminAgendaPage() {
     setShortDescription('')
     setPdfUrl('')
     setIsActive(true)
+    setStatusMessage(null)
     setIsModalOpen(true)
   }
 
@@ -94,12 +95,14 @@ export default function AdminAgendaPage() {
     setShortDescription(item.short_description)
     setPdfUrl(item.pdf_url)
     setIsActive(item.is_active)
+    setStatusMessage(null)
     setIsModalOpen(true)
   }
 
   // Upload File PDF Kalender / Agenda ke Supabase Storage 'agenda-pdf'
   const handleUploadPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
 
     if (file.type !== 'application/pdf') {
@@ -399,6 +402,23 @@ export default function AdminAgendaPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {statusMessage && (
+              <div
+                className={`sticky top-0 z-10 mt-4 flex items-center gap-3 rounded-xl border p-4 text-xs font-medium ${
+                  statusMessage.type === 'success'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    : 'border-red-200 bg-red-50 text-red-700'
+                }`}
+              >
+                {statusMessage.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                )}
+                <span>{statusMessage.text}</span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="mt-4 space-y-4 [&_label]:text-[#34443b] [&_input:not([type=file])]:border-[#dedbd2] [&_input:not([type=file])]:bg-[#faf9f6] [&_input:not([type=file])]:text-[#17231f] [&_input:not([type=file])]:placeholder:text-slate-400 [&_input:not([type=file])]:focus:border-[#bd9142] [&_textarea]:border-[#dedbd2] [&_textarea]:bg-[#faf9f6] [&_textarea]:text-[#17231f] [&_textarea]:placeholder:text-slate-400 [&_textarea]:focus:border-[#bd9142]">
               {/* Judul Agenda */}

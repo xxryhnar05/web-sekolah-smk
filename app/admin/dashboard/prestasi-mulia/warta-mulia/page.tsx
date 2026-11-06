@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowserClient'
+import { getImageUploadError, IMAGE_UPLOAD_ACCEPT } from '@/lib/image-upload'
 import {
   Plus,
   Trash2,
@@ -79,6 +80,7 @@ export default function AdminWartaMuliaPage() {
     setAuthorName('Admin Redaksi')
     setUploadDate(new Date().toISOString().split('T')[0])
     setIsActive(true)
+    setStatusMessage(null)
     setIsModalOpen(true)
   }
 
@@ -89,13 +91,21 @@ export default function AdminWartaMuliaPage() {
     setAuthorName(item.author_name)
     setUploadDate(item.upload_date)
     setIsActive(item.is_active)
+    setStatusMessage(null)
     setIsModalOpen(true)
   }
 
   // Upload Foto Koran ke Supabase Storage 'warta-mulia'
   const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
+
+    const fileError = getImageUploadError(file)
+    if (fileError) {
+      setStatusMessage({ type: 'error', text: fileError })
+      return
+    }
 
     setUploading(true)
     setStatusMessage(null)
@@ -373,6 +383,23 @@ export default function AdminWartaMuliaPage() {
               </button>
             </div>
 
+            {statusMessage && (
+              <div
+                className={`sticky top-0 z-10 mt-4 flex items-center gap-3 rounded-xl border p-4 text-xs font-medium ${
+                  statusMessage.type === 'success'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    : 'border-red-200 bg-red-50 text-red-700'
+                }`}
+              >
+                {statusMessage.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
+                )}
+                <span>{statusMessage.text}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="mt-4 space-y-4 [&_label]:text-[#34443b] [&_input:not([type=file])]:border-[#dedbd2] [&_input:not([type=file])]:bg-[#faf9f6] [&_input:not([type=file])]:text-[#17231f] [&_input:not([type=file])]:placeholder:text-slate-400 [&_input:not([type=file])]:focus:border-[#bd9142]">
               {/* Judul Berita */}
               <div>
@@ -398,11 +425,11 @@ export default function AdminWartaMuliaPage() {
                   <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-slate-950 p-4 hover:border-amber-400/50 transition">
                     <Upload className="h-6 w-6 text-amber-400 mb-1" />
                     <span className="text-xs font-semibold text-slate-300">
-                      {uploading ? 'Mengunggah foto...' : 'Pilih Foto Koran (PNG, JPG, JPEG)'}
+                      {uploading ? 'Mengunggah foto...' : 'Pilih Foto Koran (JPG, PNG, WEBP)'}
                     </span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept={IMAGE_UPLOAD_ACCEPT}
                       onChange={handleUploadImage}
                       disabled={uploading}
                       className="hidden"
