@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 
+export const revalidate = 0;
+
 interface StudentAffairItem {
   id: string;
   title: string;

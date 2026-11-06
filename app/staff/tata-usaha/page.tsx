@@ -1,6 +1,8 @@
 import { supabase } from "@/lib/supabaseClient";
 import StaffDirectory, { type StaffDirectoryItem } from "@/component/staff-directory";
 
+export const revalidate = 0;
+
 export default async function TataUsahaPage() {
   const { data } = await supabase
     .from("staff")
