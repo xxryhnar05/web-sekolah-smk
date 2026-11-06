@@ -5,7 +5,7 @@ import PhotoCarousel from '../photo-carousel'
 
 export const revalidate = 0
 
-export default async function DkfUserPage() {
+export default async function TkjUserPage() {
   const { data: major } = await supabase
     .from('majors')
     .select('*')
@@ -58,7 +58,7 @@ export default async function DkfUserPage() {
                   className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-5xl"
                   style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
                 >
-                  DKF
+                  TKJ
                 </h1>
               </div>
               <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">
@@ -112,12 +112,12 @@ export default async function DkfUserPage() {
                 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-5xl"
                 style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
               >
-                DKF
+                TKJ
               </h1>
             </div>
           </header>
 
-          <PhotoCarousel images={bannerImages} title="DKF" />
+          <PhotoCarousel images={bannerImages} title="TKJ" />
 
           <div className="mx-auto max-w-3xl">
             {(major.graduate_competency || major.head_of_major) && (
@@ -131,7 +131,7 @@ export default async function DkfUserPage() {
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-slate-400">
                     <span className="font-medium text-amber-300">
-                      DKF
+                      TKJ
                     </span>
                     {major.head_of_major && (
                       <>
@@ -186,7 +186,7 @@ export default async function DkfUserPage() {
               <section className="border-t border-white/10 py-8 sm:py-10">
                 <div className="mb-6">
                   <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-amber-400/80">
-                    Mengapa DKF
+                    Mengapa TKJ
                   </p>
                   <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     Keunggulan

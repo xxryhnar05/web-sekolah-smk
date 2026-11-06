@@ -206,7 +206,6 @@ export default function AdminEventWisudaPage() {
         upload_date: uploadDate,
         cover_image_url: coverImageUrl,
         detail_images: detailImages,
-        description: '',
         is_active: isActive,
         updated_at: new Date().toISOString(),
       }

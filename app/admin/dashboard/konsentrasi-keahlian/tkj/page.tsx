@@ -45,7 +45,7 @@ const textareaClass =
   'w-full rounded-lg border border-[#dedbd2] bg-[#faf9f6] p-3.5 text-sm leading-7 text-[#17231f] placeholder:text-slate-400 transition focus:border-[#bd9142] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#bd9142]/10'
 const listTextareaClass = `${textareaClass} font-mono text-xs`
 
-export default function AdminDkfPage() {
+export default function AdminTkjPage() {
   const router = useRouter()
   const [teiData, setTeiData] = useState<MajorTEI | null>(null)
   const [loading, setLoading] = useState(true)
@@ -54,10 +54,10 @@ export default function AdminDkfPage() {
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // State Form Input Text
-  const [name, setName] = useState('Teknik Elektronika Industri')
+  const [name, setName] = useState('Teknik Komputer dan Jaringan')
   const [headOfMajor, setHeadOfMajor] = useState('')
   const [graduateCompetency, setGraduateCompetency] = useState('')
-  const [jobIntro, setJobIntro] = useState('Tamatan siswa Teknik Elektronika Industri tersalurkan di berbagai bidang seperti :')
+  const [jobIntro, setJobIntro] = useState('Tamatan siswa Teknik Komputer dan Jaringan tersalurkan di berbagai bidang seperti :')
   const [jobOpportunitiesText, setJobOpportunitiesText] = useState('')
   const [labFacilitiesText, setLabFacilitiesText] = useState('')
   const [advantagesText, setAdvantagesText] = useState('')
@@ -82,10 +82,10 @@ export default function AdminDkfPage() {
       if (data) {
         setTeiData(data)
         setCustomSections(parseCustomSections(data.custom_sections))
-        setName(data.name || 'Teknik Elektronika Industri')
+        setName(data.name || 'Teknik Komputer dan Jaringan')
         setHeadOfMajor(data.head_of_major || '')
         setGraduateCompetency(data.graduate_competency || data.description || '')
-        setJobIntro(data.job_intro || 'Tamatan siswa Teknik Elektronika Industri tersalurkan di berbagai bidang seperti :')
+        setJobIntro(data.job_intro || 'Tamatan siswa Teknik Komputer dan Jaringan tersalurkan di berbagai bidang seperti :')
         setJobOpportunitiesText(data.job_opportunities ? data.job_opportunities.join('\n') : '')
         setLabFacilitiesText(data.lab_facilities_list ? data.lab_facilities_list.join('\n') : '')
         setAdvantagesText(data.advantages ? data.advantages.join('\n') : '')
@@ -100,7 +100,7 @@ export default function AdminDkfPage() {
         }
       }
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: 'Gagal memuat data DKF dari database.' })
+      setStatusMessage({ type: 'error', text: 'Gagal memuat data TKJ dari database.' })
     } finally {
       setLoading(false)
     }
@@ -207,13 +207,13 @@ export default function AdminDkfPage() {
         if (error) throw error
       }
 
-      setStatusMessage({ type: 'success', text: 'Halaman DKF berhasil diperbarui!' })
+      setStatusMessage({ type: 'success', text: 'Halaman TKJ berhasil diperbarui!' })
       setSelectedBannerFiles([])
       setBannerPreviewUrls([])
       fetchTeiData()
       router.refresh()
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: err.message || 'Gagal menyimpan data DKF.' })
+      setStatusMessage({ type: 'error', text: err.message || 'Gagal menyimpan data TKJ.' })
     } finally {
       setSaving(false)
       setUploading(false)
@@ -224,7 +224,7 @@ export default function AdminDkfPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center text-slate-400">
         <Loader2 className="h-6 w-6 animate-spin text-[#bd9142]" />
-        <span className="ml-3 text-sm">Memuat data Admin DKF...</span>
+        <span className="ml-3 text-sm">Memuat data Admin TKJ...</span>
       </div>
     )
   }
@@ -240,10 +240,10 @@ export default function AdminDkfPage() {
           </p>
           <h1 className="mt-4 flex items-center gap-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             <Cpu className="h-7 w-7 shrink-0 text-amber-300" />
-            Kelola DKF
+            Kelola TKJ
           </h1>
           <p className="mt-3 max-w-md text-sm leading-6 text-white/65">
-            Perbarui galeri, kompetensi lulusan, prospek kerja, fasilitas, dan keunggulan Teknik Elektronika Industri.
+            Perbarui galeri, kompetensi lulusan, prospek kerja, fasilitas, dan keunggulan Teknik Komputer dan Jaringan.
           </p>
         </div>
         <div className="mt-7 border-t border-white/10 pt-5 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
@@ -255,7 +255,7 @@ export default function AdminDkfPage() {
               <Cpu className="h-4 w-4" />
             </span>
             <span>
-              <span className="block text-xs font-medium text-white/85">Profil DKF</span>
+              <span className="block text-xs font-medium text-white/85">Profil TKJ</span>
               <span className="mt-1 block text-[11px] text-white/45">Konten halaman publik</span>
             </span>
           </div>
@@ -287,7 +287,7 @@ export default function AdminDkfPage() {
               <Cpu className="h-4 w-4" />
             </span>
             <div>
-              <h2 className="text-sm font-semibold tracking-tight text-[#17231f]">Formulir Konsentrasi Keahlian DKF</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-[#17231f]">Formulir Konsentrasi Keahlian TKJ</h2>
               <p className="mt-0.5 text-xs text-slate-500">Perubahan akan tampil di halaman publik setelah disimpan.</p>
             </div>
           </div>
@@ -332,7 +332,7 @@ export default function AdminDkfPage() {
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f2efe7] text-[#a57c31]">
               <ImageIcon className="h-4 w-4" />
             </span>
-            Galeri Foto DKF
+            Galeri Foto TKJ
           </label>
 
           {/* Banner yang sudah tersimpan di database */}
@@ -428,7 +428,7 @@ export default function AdminDkfPage() {
               type="text"
               value={jobIntro}
               onChange={(e) => setJobIntro(e.target.value)}
-              placeholder="Tamatan siswa Teknik Elektronika Industri tersalurkan di berbagai bidang seperti :"
+              placeholder="Tamatan siswa Teknik Komputer dan Jaringan tersalurkan di berbagai bidang seperti :"
               className={inputClass}
             />
           </div>
@@ -439,7 +439,7 @@ export default function AdminDkfPage() {
               rows={5}
               value={jobOpportunitiesText}
               onChange={(e) => setJobOpportunitiesText(e.target.value)}
-              placeholder="Teknisi Industri&#10;Automation Engineer&#10;Operator Produksi&#10;Teknisi Service"
+              placeholder="Network Engineer&#10;Teknisi Komputer&#10;Administrator Jaringan&#10;IT Support"
               className={listTextareaClass}
             />
           </div>
@@ -457,7 +457,7 @@ export default function AdminDkfPage() {
             rows={4}
             value={labFacilitiesText}
             onChange={(e) => setLabFacilitiesText(e.target.value)}
-            placeholder="Bengkel Kendali Otomasi & PLC&#10;Bengkel Mikroprosesor & IoT&#10;Bengkel Solder & Elekronika Dasar&#10;Laboratorium Komputer SIM"
+            placeholder="Laboratorium Jaringan Komputer&#10;Laboratorium Perakitan Komputer&#10;Laboratorium Server & Administrasi Sistem&#10;Laboratorium Fiber Optik"
             className={listTextareaClass}
           />
         </section>
@@ -474,7 +474,7 @@ export default function AdminDkfPage() {
             rows={4}
             value={advantagesText}
             onChange={(e) => setAdvantagesText(e.target.value)}
-            placeholder="Menguasai Pengukuran Komponen Elektronika&#10;Merawat Peralatan Kendali Industri&#10;Membuat Rangkaian Otomatisasi PLC&#10;Memperbaiki Modul Elektronika"
+            placeholder="Merakit & Memperbaiki Komputer&#10;Mengonfigurasi Jaringan LAN & WAN&#10;Mengelola Server & Keamanan Jaringan&#10;Menyambung & Menguji Fiber Optik"
             className={listTextareaClass}
           />
         </section>
@@ -495,7 +495,7 @@ export default function AdminDkfPage() {
             ) : (
               <>
                 <Save className="h-4 w-4" />
-                <span>Simpan Perubahan DKF</span>
+                <span>Simpan Perubahan TKJ</span>
               </>
             )}
           </button>

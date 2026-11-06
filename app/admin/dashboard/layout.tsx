@@ -23,7 +23,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
           <span aria-hidden="true" className="absolute inset-0 bg-[url('/batik2.png')] bg-[length:230px_auto] opacity-[0.12]" />
           <Image src="/logoo.png" width={40} height={40} alt="" className="relative h-10 w-10 rounded-full bg-white p-0.5 object-contain" />
           <span className="min-w-0">
-            <span className="relative block truncate text-[11px] font-bold tracking-[0.08em] text-white">SMA MUTU</span>
+            <span className="relative block truncate text-[11px] font-bold tracking-[0.08em] text-white">SMK MUTU</span>
             <span className="relative mt-1 block text-[10px] font-medium text-amber-300/80">PORTAL PENGELOLAAN</span>
           </span>
         </Link>

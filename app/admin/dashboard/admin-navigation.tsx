@@ -49,7 +49,7 @@ const aboutGroups: MenuGroup[] = [
   {
     title: "Konsentrasi Keahlian",
     items: [
-      ["DKF", "/admin/dashboard/konsentrasi-keahlian/dkf"],
+      ["TKJ", "/admin/dashboard/konsentrasi-keahlian/tkj"],
       ["TKR", "/admin/dashboard/konsentrasi-keahlian/tkr"],
       ["DKV", "/admin/dashboard/konsentrasi-keahlian/dkv"],
     ],

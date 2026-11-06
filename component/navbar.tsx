@@ -46,7 +46,7 @@ const aboutMenuGroups = [
 ];
 
 const konsentrasiKeahlian = [
-  { label: "DKF", href: "/konsentrasi-keahlian/dkf" },
+  { label: "TKJ", href: "/konsentrasi-keahlian/tkj" },
   { label: "TKR", href: "/konsentrasi-keahlian/tkr" },
   { label: "DKV", href: "/konsentrasi-keahlian/dkv" },
 ];
